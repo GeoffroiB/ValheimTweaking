@@ -1,2 +1,0 @@
-C:\Users\GeoffroiB\dev\valheim\ValheimTweaking\ValheimPlus\obj\Debug\ValheimPlus.csprojAssemblyReference.cache
-C:\Users\GeoffroiB\dev\valheim\ValheimTweaking\ValheimPlus\obj\Debug\ValheimPlus.csproj.CoreCompileInputs.cache

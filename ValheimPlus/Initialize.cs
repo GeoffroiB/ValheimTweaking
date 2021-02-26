@@ -18,26 +18,17 @@ using Steamworks;
 
 namespace ValheimTweaking
 {
-    
-
     [BepInPlugin("org.bepinex.plugins.valheim_tweaking", "Valheim Tweaking", "0.1")]
-    class ValheimTweakingPlugin : BaseUnityPlugin
+    class ValheimTweaking : BaseUnityPlugin
     {
-        // DO NOT REMOVE MY CREDITS
-        //public static string Author = "Kevin 'nx' J.";
-        //public static string Website = "http://n-x.xyz";
-        //public static string Discord = "nx#8830";
-        //public static string Repository = "https://github.com/nxPublic/ValheimPlus";
-        //public static string ApiRepository = "https://api.github.com/repos/nxPublic/valheimPlus/tags";
-
         public static Boolean isDebug = false;
 
-        private static ValheimTweakingPlugin m_instance;
-        public static ValheimTweakingPlugin instance => ValheimTweakingPlugin.m_instance;
+        private static ValheimTweaking m_instance;
+        public static ValheimTweaking instance => ValheimTweaking.m_instance;
 
         // Awake is called once when both the game and the plug-in are loaded
         void Awake() {
-            ValheimTweakingPlugin.m_instance = this;
+            ValheimTweaking.m_instance = this;
 
             Logger.LogInfo("Trying to load the configuration file \"" + Settings.getPath() + "\"");
             if (!Settings.exists()) {
@@ -45,30 +36,42 @@ namespace ValheimTweaking
                 return;
             }
 
-            Logger.LogInfo("Configuration file found, loading configuration.");
+            Logger.LogInfo("Configuration file found, loading configuration...");
             if (Settings.loadSettings() != true) {
                 Logger.LogError("Error while loading configuration file");
+                Logger.LogWarning("Please make sure \"" + Settings.getPath() + "\" was properly placed.");
                 return;
             }
             
             Logger.LogInfo("Configuration file loaded succesfully.");
 
             if (Settings.isEnabled("Server")) {
-                ValheimTweaking.ServerPatches.patch();
+                ServerPatches.patch();
             }
-            
-            // (new Harmony("mod.valheim_tweaking")).PatchAll();
-
-            //if (Settings.isNewVersionAvailable("0.6")) {
-            //    Logger.LogError("There is a newer version available of ValheimPlus.");
-            //    Logger.LogWarning("Please visit " + ValheimTweakingPlugin.Repository + ".");
-            //    return;
-            //}
-            //Logger.LogInfo("ValheimTweaking is up to date.");
+        }
+        
+        public static void LogDebug(object data) {
+            ValheimTweaking.m_instance.Logger.LogDebug(data);
         }
 
-        public void LogInfo(object data) {
-            Logger.LogInfo(data);
+        public static void LogError(object data) {
+            ValheimTweaking.m_instance.Logger.LogError(data);
+        }
+
+        public static void LogFatal(object data) {
+            ValheimTweaking.m_instance.Logger.LogFatal(data);
+        }
+
+        public static void LogInfo(object data) {
+            ValheimTweaking.m_instance.Logger.LogInfo(data);
+        }
+
+        public static void LogMessage(object data) {
+            ValheimTweaking.m_instance.Logger.LogMessage(data);
+        }
+
+        public static void LogWarning(object data) {
+            ValheimTweaking.m_instance.Logger.LogWarning(data);
         }
     }
 }

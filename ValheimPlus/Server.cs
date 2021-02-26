@@ -89,61 +89,49 @@ namespace ValheimTweaking
         public const string HARMONY_ID = "org.bepinex.plugins.valheim_tweaking.server_patches";
 
         private static Harmony harmony;
+        private static bool m_isServer = false;
 
         public static void patch() {
             harmony = new Harmony(HARMONY_ID);
 
             harmony.Patch(
                 AccessTools.Method(typeof(ZNet), "Awake"),
-                null, // new HarmonyMethod(SymbolExtensions.GetMethodInfo((ZNet __instance) => postfixSendPeerInfo(__instance)))
-                new HarmonyMethod(typeof(Patch_OverrideServerMaxBandwith).GetMethod("postfix"))
+                null,
+                new HarmonyMethod(typeof(Patch_ZNetAwake).GetMethod("postfix"))
             );
 
-            //var target_method = typeof(Patch_OverrideServerMaxBandwith).GetMethod("postfix");
-            //if (target_method == null) {
-            //    return;
-            //}
-            //var prefix_callable = ;
-            //if (prefix_callable == null) {
-            //    return;
-            //}
-            //var postfix_callable = new HarmonyMethod(SymbolExtensions.GetMethodInfo(() => Patch1.postfix()));
-            //if (postfix_callable == null) {
-            //    return;
-            //}
+            harmony.Patch(
+                AccessTools.Method(typeof(ZNet), "Update"),
+                null,
+                new HarmonyMethod(typeof(Patch_ZNetAwake).GetMethod("postfix"))
+            );
         }
 
-        public static class Patch_OverrideServerMaxBandwith
+        public static class Patch_ZNetAwake
         {
-            private const int DEFAULT_dataPerSec = 61440;
-            private const int OVERRIDE_dataPerSec_ratio = 2;
+            public const int DEFAULT_dataPerSec = 61440;
+            public const int OVERRIDE_dataPerSec_ratio = 2;
 
             public static void postfix(ZNet __instance) {
+                ServerPatches.m_isServer = __instance.IsServer();
+
                 if (__instance.m_zdoMan.m_dataPerSec == DEFAULT_dataPerSec) {
                     __instance.m_zdoMan.m_dataPerSec *= OVERRIDE_dataPerSec_ratio;
                 }
-                ValheimTweakingPlugin.instance.LogInfo("m_dataPerSec overriden to " + __instance.m_zdoMan.m_dataPerSec);
+
+                ValheimTweaking.LogInfo("m_dataPerSec overriden to " + __instance.m_zdoMan.m_dataPerSec);
             }
         }
 
         public static class Patch_SpamPeers
         {
-            public static void postfixSpamPeers() {
-                if (ZNet.instance.IsServer()) {
-                    if (ZNet.instance.m_peers.Count() > 0) {
-                        Debug.Log("Spamming friends;");
-                        foreach (ZNetPeer peer in ZNet.instance.m_peers) {
-                            ZNet.instance.RemotePrint(peer.m_rpc, "hello");
-                        }
+            public static void postfix() {
+                if (ServerPatches.m_isServer) {
+                    foreach (ZNetPeer peer in ZNet.instance.m_peers) {
+                        ZNet.instance.RemotePrint(peer.m_rpc, "rawr Xd ;)");
                     }
-                        
-                    else
-                        Debug.Log("Would be spamming if friends");
-                } else {
-                    Debug.Log("Not spammer");
                 }
             }
         }
-
     }
 }
