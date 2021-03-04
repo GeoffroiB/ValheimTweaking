@@ -24,7 +24,7 @@ namespace ValheimTweaking
     {
         public static IniData Config { get; set; }
 
-        private static string ConfigPath = Path.GetDirectoryName(Paths.BepInExConfigPath) + "\\tweaking.ini";
+        private static string ConfigPath = Path.GetDirectoryName(Paths.BepInExConfigPath) + "/tweaking.ini";
 
         public static string getPath() {
             return ConfigPath;
@@ -35,12 +35,10 @@ namespace ValheimTweaking
         }
 
         public static bool loadSettings() {
-            try {
-                var parser = new FileIniDataParser();
-                Config = parser.ReadFile(ConfigPath);
-            } catch (Exception ex) {
+            if (!Settings.exists()) {
                 return false;
             }
+            Config = (new FileIniDataParser()).ReadFile(ConfigPath);
             return true;
         }
 
